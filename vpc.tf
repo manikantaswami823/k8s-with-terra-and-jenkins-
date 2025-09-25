@@ -17,9 +17,10 @@ module "vpc"{
         "kubernetes.io/role/elb" = 1
     }
     
-    privagte_subnet_tags = {
+    private_subnet_tags = {
         "kubernetes.io/role/internal-elb" = 1
     }
+
 
 
 
