@@ -1,46 +1,26 @@
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.15.1"
+  version = "21.0.0"
 
-  cluster_name                  = local.name
-  cluster_version               = "1.32"                # specify Kubernetes version
-  cluster_endpoint_public_access = true
+  cluster_name    = "eks-staging-cluster"
+  cluster_version = "1.32"  # Ensure AMI compatibility
 
-  cluster_addons = {
-    coredns = {
-      version     = "v1.12.0-eksbuild.1"              # compatible add-on version
-      most_recent = false
-    }
-    kube_proxy = {
-      version     = "v1.32.1-eksbuild.1"
-      most_recent = false
-    }
-    vpc_cni = {
-      version     = "v1.12.2-eksbuild.1"
-      most_recent = false
+  subnets = module.vpc.private_subnets
+  vpc_id  = module.vpc.vpc_id
+
+  node_groups = {
+    k8s_stagingggg = {
+      desired_capacity = 2
+      max_capacity     = 3
+      min_capacity     = 1
+
+      instance_type = "t3.medium"
+      ami_type      = "AL2_x86_64" # compatible with k8s 1.32
     }
   }
 
-  vpc_id                   = module.vpc.id              # correct output from your VPC module
-  subnet_ids               = module.vpc.private_subnets
-  control_plane_subnet_ids = module.vpc.intra_subnets
-
-  eks_managed_node_group_defaults = {
-    instance_types                        = ["m4.large"]
-    attach_cluster_primary_security_group = true
-    ami_type                              = "CUSTOM"        # CUSTOM lets EKS choose the correct AL2 for v1.33
-  }
-
-  eks_managed_node_groups = {
-    k8s-stagingggg = {
-      min_size      = 1
-      max_size      = 2
-      desired_size  = 1
-      instance_types = ["t3.large"]
-      capacity_type  = "SPOT"
-      tags = {
-        ExtraTag = "Helloworld"
-      }
-    }
+  tags = {
+    Environment = "staging"
+    Project     = "eks"
   }
 }
