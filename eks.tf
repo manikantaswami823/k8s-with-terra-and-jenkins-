@@ -3,7 +3,7 @@ module "eks" {
   version = "19.15.1"
 
   cluster_name                  = local.name
-  cluster_version               = "1.33"                # specify Kubernetes version
+  cluster_version               = "1.32"                # specify Kubernetes version
   cluster_endpoint_public_access = true
 
   cluster_addons = {
